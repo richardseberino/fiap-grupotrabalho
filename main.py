@@ -1,5 +1,6 @@
 import menus
 import operacoes
+from db_service import read_csv, write_csv
 
 def main():
   menu = menus.menu_principal()
@@ -18,4 +19,6 @@ def main():
         continue
       
 if __name__ == "__main__":
+  culturas = read_csv('db.csv')
   main()
+  write_csv('db.csv', culturas)
