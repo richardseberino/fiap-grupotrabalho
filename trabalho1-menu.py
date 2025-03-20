@@ -1,3 +1,32 @@
+import csv
+
+def le_arquivo(path: str) -> list[dict]:
+    data = []
+
+    try:
+        with open(path, mode='r', encoding='utf-8') as file:
+            reader = csv.DictReader(file, delimiter=';')
+            for line in reader:
+                linha = {"cultura": line['cultura'], 
+                    "altura": int(line['altura']),
+                    "largura": int(line['largura']),
+                    "areaTotal": int(line['areaTotal']),
+                    "areaUtil": int(line['areaUtil']),
+                    "insumos": int(line['insumos'])
+                    }
+                data.append(linha)
+    except FileNotFoundError:
+        data = [] 
+    return data
+
+def salva_arquivo(path: str, data: list[dict]):
+    header = ['cultura', 'altura', 'largura', 'areaUtil', 'areaTotal', 'insumos']
+    with open(path, mode='w', newline='', encoding='utf-8') as file:
+        writer = csv.DictWriter(file, fieldnames=header, delimiter=';')
+        writer.writeheader()
+        writer.writerows(data)
+
+
 def imprimeValores(itens):
     for volta in range(0, len(itens), 1):
         print("# "+ str(volta+1)  +  " - Cultura: " + itens[volta]["cultura"] + ", altura: " 
@@ -35,7 +64,7 @@ def informaCultura():
     return dados
 
 continua = True
-lista = []
+lista = le_arquivo("teste.csv")
 
 while continua:
     print("Menu de opções:\n")
@@ -84,5 +113,6 @@ while continua:
 
     elif opcao == 5:
         imprimeValores(lista)
+        salva_arquivo("teste.csv", lista)
         
 
