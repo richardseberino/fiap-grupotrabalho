@@ -1,17 +1,43 @@
 import csv
 
-continua = True
-# altura e largura
-area = [0,0]
-cultura = ""
-areaTotal = 0
-areaUtil = 0
-insumos = 0
-densidade = 0
-insumo_m2 = 0
-
-culturas = []
+lista = []
 bd_path = 'bd.csv'
+
+def imprimeValores(itens):
+    for volta in range(0, len(itens), 1):
+        print("# "+ str(volta+1)  +  " - Cultura: " + itens[volta]["cultura"] + ", altura: " 
+              + str(itens[volta]["altura"]) + ", largura: " + str(itens[volta]["largura"]) 
+              + ", area Total: " + str(itens[volta]["areaTotal"])
+              + ", area Util: " + str(itens[volta]["areaUtil"]) 
+              + ", Insumos: " + str(itens[volta]["insumos"])) 
+
+def informaCultura():
+    print ("Qual o tipo de Cultura?\n1 - Café\n2 - Milho")
+    volta = True
+    ruas = 0
+    while volta:
+        c = int(input("Escolha a opção: "))
+        if c==1:
+            cultura = "Café"
+            ruas = 10
+            volta = False
+        elif c==2:
+            cultura = "Milho"
+            ruas = 5
+            volta = False
+        else:
+            print("Opção inválida!")            
+    
+    altura = int(input("Informa a altura da area de plantio me metros: "))
+    largura = int(input("Informe a largura da area de plantio em metros: "))
+    dados = {"cultura": cultura, 
+              "altura": altura,
+              "largura": largura,
+              "areaTotal": (altura*largura),
+              "areaUtil": 0,
+              "insumos": 0
+              }
+    return dados
 
 def read_csv(path: str) -> list[dict]:
     data = []
@@ -30,9 +56,8 @@ def write_csv(path: str, data: list[dict]):
         writer.writeheader()
         writer.writerows(data)
 
-
 def run():
-    while continua:
+    while True:
         print("Menu de opções:\n")
 
         print("1 - Informar os dados para calculo")
@@ -45,65 +70,42 @@ def run():
         opcao = int(input("Escolha a opção desejada: "))
 
         if opcao == 0:
-            continua = False
+            break
         elif opcao == 1:
-            print ("Qual o tipo de Cultura?\n1 - Café\n2 - Milho")
-            volta = True
-            while volta:
-                c = int(input("Escolha a opção: "))
-                if c==1:
-                    cultura = "Café"
-                    volta = False
-                elif c==2:
-                    cultura = "Milho"
-                    volta = False
-                else:
-                    print("Opção inválida!")            
-        
-            area[0] = int(input("Informa a altura da area de plantio me metros: "))
-            area[1] = int(input("Informe a largura da area de plantio em metros: "))
+            lista.append(informaCultura())
         elif opcao == 2:
-            print ("Qual o tipo de Cultura?\n1 - Café\n2 - Milho")
-            volta = True
-            while volta:
-                c = int(input(f"Escolha a opção (valor atual: {cultura}): "))
-                if c==1:
-                    cultura = "Café"
-                    volta = False
-                elif c==2:
-                    cultura = "Milho"
-                    volta = False
-                else:
-                    print("Opção inválida!")            
-            
-            area[0] = int(input(f"Informa a altura da area de plantio me metros (valor atual {area[0]}): "))
-            area[1] = int(input(f"Informe a largura da area de plantio em metros: (valor atual {area[1]})"))
+            print("Segue a lista atual: ")
+            imprimeValores(lista)
+            linha = int(input("Informe a linha que voce quer alterar: "))
+            if linha > len(lista):
+                print("Linha invalida!")
+            else:
+                lista[linha-1] = informaCultura()
         elif opcao == 3:
-            area[0] = 0
-            area[1] = 0
-            cultuira = ""
+            print("Segue a lista atual: ")
+            imprimeValores(lista)
+            linha = int(input("Informe a linha que voce quer excluir: "))
+            if linha > len(lista):
+                print("Linha invalida!")
+            else:
+                del(lista[linha-1])
         elif opcao == 4:
-            areaTotal = area[0] * area[1]
-            # cafe 10, milho 5
-            ruas=0
-            if cultura=="Café":
-                ruas = 10
-                densidade = 5000
-                insumo_m2 = 0.05
-            elif cultura=="Milho":
-                ruas=5
-                densidade = 60000
-                insumo_m2 = 0.02
-            areaUtil = areaTotal * ((100-ruas)/100)
-            insumos = areaUtil * insumo_m2
+            for volta in range(0, (len(lista)), 1):
+                print(volta)
+                cultura = lista[volta]["cultura"]
+                if cultura == "Café":
+                    lista[volta]["areaUtil"] = lista[volta]["areaTotal"] * 0.9
+                    insumo_m2 = 0.05
+                    lista[volta]["insumos"] = lista[volta]["areaUtil"] * insumo_m2
+                elif cultura == "Milho":
+                    lista[volta]["areaUtil"] = lista[volta]["areaTotal"] * 0.95
+                    insumo_m2 = 0.02
+                    lista[volta]["insumos"] = lista[volta]["areaUtil"] * insumo_m2
+
         elif opcao == 5:
-            print(f"Cultura: {cultura}")
-            print(f"Area total {areaTotal} metros" )
-            print(f"Area util {areaUtil} metros" )
-            print(f"Insumos {insumos} ")
-            
+            imprimeValores(lista)
 
 if __name__ == '__main__':
-    culturas = read_csv(bd_path)
+    lista = read_csv(bd_path)
     run()
-    write_csv(bd_path, culturas)
+    write_csv(bd_path, lista)
