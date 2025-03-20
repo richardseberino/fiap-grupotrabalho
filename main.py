@@ -3,7 +3,7 @@ import operacoes
 
 def main():
   menu = menus.menu_principal()
-
+  operacoes.le_arquivo("teste.csv")
   while True:
     try:
       opcao_selecionada = menu.unsafe_ask()
@@ -18,4 +18,5 @@ def main():
         continue
       
 if __name__ == "__main__":
+ 
   main()
