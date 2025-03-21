@@ -47,4 +47,3 @@ def nova_cultuta(tipo_cultura, altura, largura):
     "area_util": area_util,
     "insumos": insumos,
   }
-    
