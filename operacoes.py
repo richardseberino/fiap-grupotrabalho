@@ -2,42 +2,15 @@ import util
 import sys
 import questionary
 import culturas
-import csv
+import data_source
 
-
+# Constantes usadas para executar operações via código
+# Onde não existe iteração do usuário
 SAIR = 5
+CARREGAR_CULTURAS = 6
 LIMPAR_TERMINAL = -1
 
-lista = []
-
-
-
-def le_arquivo(path: str) -> list[dict]:
-    data = []
-
-    try:
-        with open(path, mode='r', encoding='utf-8') as file:
-            reader = csv.DictReader(file, delimiter=';')
-            for line in reader:
-                linha = {"cultura": line['cultura'], 
-                    "altura": int(line['altura']),
-                    "largura": int(line['largura']),
-                    "areaTotal": int(line['areaTotal']),
-                    "areaUtil": int(line['areaUtil']),
-                    "insumos": int(line['insumos'])
-                    }
-                data.append(linha)
-    except FileNotFoundError:
-        data = [] 
-    return data
-
-def salva_arquivo(path: str, data: list[dict]):
-    header = ['cultura', 'altura', 'largura', 'areaUtil', 'areaTotal', 'insumos']
-    with open(path, mode='w', newline='', encoding='utf-8') as file:
-        writer = csv.DictWriter(file, fieldnames=header, delimiter=';')
-        writer.writeheader()
-        writer.writerows(data)
-
+# Simula a camada de controle da aplicação (C do padrão de arquitetura MVC)
 def executar(opcao_selecionada):
   match opcao_selecionada:
     case 1:
@@ -50,6 +23,8 @@ def executar(opcao_selecionada):
       __executar_acao("Deletando cultura", __deletar_cultura)
     case 5:
       __executar_acao("Saindo da aplicação...", __sair)
+    case 6:
+      data_source.carrega_dados_para_cache(culturas.CACHE_CULTURAS)
     case _:
       util.limpar_terminal()
 
@@ -68,66 +43,83 @@ def __executar_acao(titulo, acao):
   input("Pressione qualquer tecla para voltar ")
   util.limpar_terminal()
 
-
-def informarCultura():
-  cultura = questionary.select(
-      "Escolha o tipo de cultura:",
-      choices=culturas.TIPOS_DE_CULTURA,).ask()
-  altura = int(input("Informa a altura da area de plantio me metros: "))
-  largura = int(input("Informe a largura da area de plantio em metros: "))
-  insumo_m2=0
-  ruas = 0
-  if cultura == "Café":
-    insumo_m2 = 0.05
-    ruas = 0.9
-  elif cultura == "Milho":
-    insumo_m2 = 0.02
-    ruas = 0.95
-
-  dados = {"cultura": cultura, 
-            "altura": altura,
-            "largura": largura,
-            "areaTotal": (altura*largura),
-            "areaUtil": ((largura*altura)*ruas),
-            "insumos": ((largura*altura)*ruas)*insumo_m2
-            }
-  return dados
-
-def imprimeValores(itens):
-    for volta in range(0, len(itens), 1):
-        print("# "+ str(volta+1)  +  " - Cultura: " + itens[volta]["cultura"] + ", altura: " 
-              + str(itens[volta]["altura"]) + ", largura: " + str(itens[volta]["largura"]) 
-              + ", area Total: " + str(itens[volta]["areaTotal"])
-              + ", area Util: " + str(itens[volta]["areaUtil"]) 
-              + ", Insumos: " + str(itens[volta]["insumos"])) 
-
 def __criar_cultura():
-  lista.append(informarCultura())
+  nova_cultura = __formulario_cultura()
+  culturas.cria_cultura(nova_cultura)
   
-  
-def __listar_culturas():
-  print("Listando culturas")
-  imprimeValores(lista)
+  print("Cultura criada com sucesso\n")
 
 def __atualizar_cultura():
-    print("Segue a lista atual: ")
-    imprimeValores(lista)
-    linha = int(input("Informe a linha que voce quer alterar: "))
-    if linha > len(lista):
-        print("Linha invalida!")
-    else:
-        lista[linha-1] = informarCultura()
+  __listar_culturas()
 
+  indice_cultura = __safe_int_input("\nInforme a linha que você quer atualizar: ")
+  indice_cultura = indice_cultura - 1
+
+  if culturas.encontra_cultura(indice_cultura):
+    nova_cultura = __formulario_cultura()
+    culturas.atualiza_cultura(indice_cultura, nova_cultura)
+    print("Cultura atualizada com sucesso")
+  else:
+    print("Linha inválida")
+
+  print()
+
+def __formulario_cultura():
+  tipo_cultura = questionary.select(
+    "Escolha o tipo de cultura:",
+    choices=culturas.TIPOS_DE_CULTURA
+  ).ask()
+
+  altura = __safe_int_input("\nInforme a altura da área de plantio em metros: ")
+  largura = __safe_int_input("\nInforme a largura da área de plantio em metros: ")
+
+  print()
+  
+  return culturas.nova_cultuta(tipo_cultura, altura, largura)
+
+def __listar_culturas():
+  header = f"| {"ID".ljust(4)} | Cultura | Altura | Largura | Área total | Área util | {"Insumos".ljust(10)} |"
+
+  line = '-' * len(header)
+  print(line)
+  print(header)
+  print(line)
+
+  for index, plantio in enumerate(culturas.lista_culturas()):
+    id = f"{str(index + 1)}"
+    cultura = plantio["cultura"]
+    altura = str(plantio["altura"])
+    largura = str(plantio["largura"])
+    area_total = format(plantio["area_total"], ".2f")
+    area_util = format(plantio["area_util"], ".2f")
+    insumos = format(plantio["insumos"], ".2f")
+
+    print(f"| {id.ljust(4)} | {cultura.ljust(7)} | {altura.ljust(6)} | {largura.ljust(7)} | {area_total.ljust(10)} | {area_util.ljust(9)} | {insumos.ljust(10)} |")
+    print(line)
 
 def __deletar_cultura():
-      print("Segue a lista atual: ")
-      imprimeValores(lista)
-      linha = int(input("Informe a linha que voce quer excluir: "))
-      if linha > len(lista):
-          print("Linha invalida!")
-      else:
-          del(lista[linha-1])
+  __listar_culturas()
+
+  indice_linha = __safe_int_input("\nInforme a linha que você quer excluir: ")
+
+  if culturas.deleta_cultura(indice_linha-1):
+    print("Cultura removida com sucesso")
+  else:
+    print("Linha inválida")
+
+  print() 
+
+def __safe_int_input(texto):
+  valor = 0
+  while valor < 1:
+    try:
+      valor = int(input(texto))
+    except ValueError:
+      print("Valor informado não é um número.\n")
+
+  return valor
 
 def __sair():
-  salva_arquivo("teste.csv", lista)
+  # Atualiza o CSV ao sair do programa
+  data_source.salva_dados_do_cache(culturas.CACHE_CULTURAS)
   sys.exit("Até logo ✌\n")
