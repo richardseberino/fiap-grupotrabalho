@@ -23,27 +23,29 @@ def deleta_cultura(identificafor):
   except IndexError:
     return None
 
-def nova_cultuta(tipo_cultura, altura, largura):
-  area_total = altura * largura
+def nova_cultuta(tipo_cultura, comprimento, largura):
+  area_total = comprimento * largura
 
-  insumos_m2 = 0
   ruas = 0
-
+  # NPK é um tipo de insumo no qual a unidade que estamos utilizando
+  # é kg/m2
+  npk = 0
+  
   if tipo_cultura == "Café":
-    insumos_m2 = 0.05
-    ruas = 0.9
+    ruas = 0.9 # Número de ruas para plantio de café normalmente corresponde a 90% da área total
+    npk = 0.015 # Para café a quantidade de NPK utilizado corresponse a 1.5% da área útil
   else:
-    insumos_m2 = 0.02
-    ruas = 0.95
-
+    ruas = 0.95 # Número de ruas para plantio de milho normalmente corresponde a 95% da área total
+    npk = 0.04 # Para ilho a quantidade de NPK utilizado corresponse a 4% da área útil
+    
   area_util = area_total * ruas
-  insumos = area_util * insumos_m2
+  npk_necessario = area_util * npk
 
   return {
     "cultura": tipo_cultura,
-    "altura": altura,
+    "comprimento": comprimento,
     "largura": largura,
     "area_total": area_total,
     "area_util": area_util,
-    "insumos": insumos,
+    "npk": npk_necessario,
   }

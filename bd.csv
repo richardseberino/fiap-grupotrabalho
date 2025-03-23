@@ -1,4 +1,4 @@
-cultura;altura;largura;area_util;area_total;insumos
+cultura;comprimento;largura;area_util;area_total;npk_kg_m2
 Café;200;200;144000.0;160000.0;4123412.0
 Café;400;400;56250.0;62500.0;41234.0
 Milho;600;600;237500.0;250000.0;23412.0
