@@ -70,15 +70,15 @@ def __formulario_cultura():
     choices=culturas.TIPOS_DE_CULTURA
   ).ask()
 
-  altura = __safe_int_input("\nInforme a altura da área de plantio em metros: ")
+  comprimento = __safe_int_input("\nInforme a comprimento da área de plantio em metros: ")
   largura = __safe_int_input("\nInforme a largura da área de plantio em metros: ")
 
   print()
   
-  return culturas.nova_cultuta(tipo_cultura, altura, largura)
+  return culturas.nova_cultuta(tipo_cultura, comprimento, largura)
 
 def __listar_culturas():
-  header = f"| {"ID".ljust(4)} | Cultura | Altura | Largura | Área total | Área util | {"Insumos".ljust(10)} |"
+  header = f"| {"ID".ljust(4)} | Cultura | Comprimento | Largura | Área total | Área util | {"NPK kg/m2".ljust(10)} |"
 
   line = '-' * len(header)
   print(line)
@@ -88,13 +88,13 @@ def __listar_culturas():
   for index, plantio in enumerate(culturas.lista_culturas()):
     id = f"{str(index + 1)}"
     cultura = plantio["cultura"]
-    altura = str(plantio["altura"])
+    comprimento = str(plantio["comprimento"])
     largura = str(plantio["largura"])
     area_total = format(plantio["area_total"], ".2f")
     area_util = format(plantio["area_util"], ".2f")
-    insumos = format(plantio["insumos"], ".2f")
+    npk = format(plantio["npk"], ".2f")
 
-    print(f"| {id.ljust(4)} | {cultura.ljust(7)} | {altura.ljust(6)} | {largura.ljust(7)} | {area_total.ljust(10)} | {area_util.ljust(9)} | {insumos.ljust(10)} |")
+    print(f"| {id.ljust(4)} | {cultura.ljust(7)} | {comprimento.ljust(11)} | {largura.ljust(7)} | {area_total.ljust(10)} | {area_util.ljust(9)} | {npk.ljust(10)} |")
     print(line)
 
 def __deletar_cultura():
