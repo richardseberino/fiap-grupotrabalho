@@ -1,0 +1,73 @@
+# Carregar os dados de um arquivo CSV
+dados <- read.csv("bd.csv", sep=";", header=TRUE)
+
+# Verificar os Dados
+print("Dados carregados:")
+print(dados)
+
+# Verificar o diretório atual
+print(paste("Diretório atual:", getwd()))
+
+# Separando as culturas
+cafe <- dados[dados$cultura == "Café", ]
+milho <- dados[dados$cultura == "Milho", ]
+
+# Exibir dados filtrados
+print("Dados filtrados - Café:")
+print(cafe)
+print("Dados filtrados - Milho:")
+print(milho)
+
+# Inicializar variáveis para evitar erros caso não haja dados
+cafe_media_area_util <- NA
+cafe_desvio_area_util <- NA
+cafe_media_insumos <- NA
+cafe_desvio_insumos <- NA
+
+milho_media_area_util <- NA
+milho_desvio_area_util <- NA
+milho_media_insumos <- NA
+milho_desvio_insumos <- NA
+
+# Calcular estatísticas se houver dados disponíveis
+if (nrow(cafe) > 0) {
+    cafe_media_area_util <- mean(cafe$area_util)
+    cafe_desvio_area_util <- sd(cafe$area_util)
+    cafe_media_insumos <- mean(cafe$insumos)
+    cafe_desvio_insumos <- sd(cafe$insumos)
+
+    print("Média e Desvio Padrão - Café")
+    print(paste("Média da área útil (Café):", cafe_media_area_util))
+    print(paste("Desvio Padrão da área útil (Café):", cafe_desvio_area_util))
+    print(paste("Média dos insumos (Café):", cafe_media_insumos))
+    print(paste("Desvio Padrão dos insumos (Café):", cafe_desvio_insumos))
+} else {
+    print("Nenhum dado encontrado para Café!")
+}
+
+if (nrow(milho) > 0) {
+    milho_media_area_util <- mean(milho$area_util)
+    milho_desvio_area_util <- sd(milho$area_util)
+    milho_media_insumos <- mean(milho$insumos)
+    milho_desvio_insumos <- sd(milho$insumos)
+
+    print("Média e Desvio Padrão - Milho")
+    print(paste("Média da área útil (Milho):", milho_media_area_util))
+    print(paste("Desvio Padrão da área útil (Milho):", milho_desvio_area_util))
+    print(paste("Média dos insumos (Milho):", milho_media_insumos))
+    print(paste("Desvio Padrão dos insumos (Milho):", milho_desvio_insumos))
+} else {
+    print("Nenhum dado encontrado para Milho!")
+}
+
+# Criar um data frame com os resultados
+resultados_totais <- data.frame(
+  Cultura = c("Café", "Milho"),
+  Media_Area_Util = c(cafe_media_area_util, milho_media_area_util),
+  Desvio_Area_Util = c(cafe_desvio_area_util, milho_desvio_area_util),
+  Media_Insumos = c(cafe_media_insumos, milho_media_insumos),
+  Desvio_Insumos = c(cafe_desvio_insumos, milho_desvio_insumos)
+)
+
+# Imprimir no console
+print(resultados_totais)
