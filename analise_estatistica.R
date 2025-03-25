@@ -1,12 +1,20 @@
+install.packages("dplyr")
+library(dplyr)
+
+install.packages("rstudioapi")
+library(rstudioapi)
+
+# Verificar o diretório atual
+absolute_path <- dirname(getActiveDocumentContext()$path)
+
 # Carregar os dados de um arquivo CSV
-dados <- read.csv("bd.csv", sep=";", header=TRUE)
+csv_path = paste0(absolute_path, "/bd.csv")
+print(csv_path)
+dados <- read.csv(csv_path, sep=";", header=TRUE)
 
 # Verificar os Dados
 print("Dados carregados:")
 print(dados)
-
-# Verificar o diretório atual
-print(paste("Diretório atual:", getwd()))
 
 # Separando as culturas
 cafe <- dados[dados$cultura == "Café", ]
